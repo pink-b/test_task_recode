@@ -1,0 +1,31 @@
+.form-container {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-field {
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+.input-field:first-child {
+    margin-top: 10px;
+}
+
+.input-field:last-child {
+    margin-bottom: 0;
+}
+
+button {
+    padding: 5px 10px;
+    background-color: #0d5c10f8;
+    color: white;
+    border: none; 
+    cursor: pointer;
+    width: auto;
+}
+
+button:hover {
+    background-color: #0d5c10f8;
+}
