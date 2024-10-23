@@ -12,14 +12,14 @@ const BookStore = types.model("BookStore", {
   books: types.array(Book),
 }).actions(self => ({
   addBook(bookId: number, title: string, year: number, authorIds: number[]) {
-    self.books.push(Book.create({ id: bookId, title: title, year: year, authorsIds: authorIds }));
+    const newBook = Book.create({ id: bookId, title, year, authorsIds: authorIds });
+    self.books.push(newBook);
+    
     authorIds.forEach(authorId => {
-      const authorIndex = authorStore.authors.findIndex(author => author.id === authorId);
-      if (authorIndex !== -1) {
-        authorStore.authors[authorIndex].booksIds.push(bookId);
-      }
+      authorStore.addBookId(authorId, bookId);
     });
   },
+  
   editBook(bookId: number, newTitle: string, newYear: number, newAuthorIds: number[]) {
     const book = self.books.find(book => book.id === bookId);
     if (book) {
@@ -29,32 +29,23 @@ const BookStore = types.model("BookStore", {
       book.authorsIds.replace(newAuthorIds);
 
       oldAuthorIds.forEach(authorId => {
-        const author = authorStore.authors.find(author => author.id === authorId);
-        if (author) {
-          const bookIndex = author.booksIds.indexOf(bookId);
-          if (bookIndex !== -1) {
-            author.booksIds.splice(bookIndex, 1);
-          }
-        }
+        authorStore.removeBookId(authorId, bookId);
       });
 
       newAuthorIds.forEach(authorId => {
-        const author = authorStore.authors.find(author => author.id === authorId);
-        if (author) {
-          author.booksIds.push(bookId);
-        }
+        authorStore.addBookId(authorId, bookId);
       });
     }
   },
+  
   removeBook(bookId: number) {
     const bookIndex = self.books.findIndex(book => book.id === bookId);
     if (bookIndex !== -1) {
+      const book = self.books[bookIndex];
       self.books.splice(bookIndex, 1);
-      authorStore.authors.forEach(author => {
-        const bookIdIndex = author.booksIds.indexOf(bookId);
-        if (bookIdIndex !== -1) {
-          author.booksIds.splice(bookIdIndex, 1);
-        }
+      
+      book.authorsIds.forEach(authorId => {
+        authorStore.removeBookId(authorId, bookId);
       });
     }
   }

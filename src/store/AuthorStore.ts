@@ -23,6 +23,23 @@ const AuthorStore = types.model("AuthorStore", {
     if (authorIndex !== -1) {
       self.authors.splice(authorIndex, 1);
     }
+  },
+
+  addBookId(authorId: number, bookId: number) {
+    const author = self.authors.find(author => author.id === authorId);
+    if (author) {
+      author.booksIds.push(bookId);
+    }
+  },
+
+  removeBookId(authorId: number, bookId: number) {
+    const author = self.authors.find(author => author.id === authorId);
+    if (author) {
+      const index = author.booksIds.indexOf(bookId);
+      if (index !== -1) {
+        author.booksIds.splice(index, 1);
+      }
+    }
   }
 }));
 

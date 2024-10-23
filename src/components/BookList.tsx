@@ -18,7 +18,7 @@ const BookList = observer(() => {
 
   const searchBooks = useMemo(() => {
     return sortedBooks.filter(book => book.title.includes(searchQuery))
-  }, [searchQuery])
+  }, [searchQuery, sortedBooks])
 
   const deleteBook = (id: number) => {
     bookStore.removeBook(id);

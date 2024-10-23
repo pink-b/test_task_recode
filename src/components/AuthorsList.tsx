@@ -20,7 +20,7 @@ const AuthorsList = observer(() => {
 
   const searchAuthors = useMemo(() => {
     return sortedAuthors.filter(author => author.name.includes(searchQuery))
-  }, [searchQuery])
+  }, [searchQuery, sortedAuthors])
 
   const deleteAuthor = (id: number) => {
     authorStore.removeAuthor(id)
