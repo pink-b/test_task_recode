@@ -1,11 +1,9 @@
-import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { bookStore } from 'store/BookStore';
-import { authorStore } from 'store/AuthorStore';
 import '../styles/AddBooks.css';
-import { useFormik } from 'formik';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import NavBar from './NavBar';
+import { authorStore } from 'store/AuthorStore';
 
 const AddAuthor = observer(() => {
     const idGenerator = (() => {
@@ -13,39 +11,44 @@ const AddAuthor = observer(() => {
         return lastAuthorId + 1;
     });
 
-    const formik = useFormik({
-        initialValues: {
-            name: ''
-        },
-        validationSchema: Yup.object({
-            name: Yup.string().required('Имя обязательно')
-        }),
-        onSubmit: (values) => {
-            authorStore.addAuthor(idGenerator(), values.name, []);
-            formik.resetForm();
-            console.log("Форма отправлена");
-        }
+    const validationSchema = Yup.object().shape({
+        name: Yup.string()
+            .required('Имя автора обязательно')
+            .min(2, 'Имя должно содержать минимум 2 символа')
+            .max(50, 'Имя не может превышать 50 символов'),
     });
 
     return (
         <>
             <NavBar />
             <div>
-                <form className="form-container" onSubmit={formik.handleSubmit}>
-                    <input 
-                        className="input-field" 
-                        type="text" 
-                        placeholder="Имя"
-                        {...formik.getFieldProps('name')}
-                    />
-                    {formik.touched.name && formik.errors.name ? (
-                        <div className="error">{formik.errors.name}</div>
-                    ) : null}
-                    
-                    <button type="submit">
-                        Добавить автора
-                    </button>
-                </form>
+                <Formik
+                    initialValues={{ name: '' }}
+                    validationSchema={validationSchema}
+                    onSubmit={(values, { setSubmitting, resetForm }) => {
+                        authorStore.addAuthor(idGenerator(), values.name, []);
+                        resetForm();
+                        setSubmitting(false);
+                        console.log("Форма отправлена");
+                    }}
+                >
+                    {({ isSubmitting }) => (
+                        <Form className="form-container">
+                            <div>
+                                <Field
+                                    className="input-field"
+                                    type="text"
+                                    name="name"
+                                    placeholder="Имя"
+                                />
+                                <ErrorMessage name="name" component="div" className="error" />
+                            </div>
+                            <button type="submit" disabled={isSubmitting}>
+                                Добавить автора
+                            </button>
+                        </Form>
+                    )}
+                </Formik>
             </div>
         </>
     );
